@@ -1,6 +1,8 @@
 /* alunos.css */
 
 /* Estilo para o formulário de adição de aluno */
+
+
 form {
     display: flex;
     flex-direction: column;
@@ -18,7 +20,7 @@ form {
   button {
     padding: 10px;
     border: none;
-    background-color: blue;
+    background-color: rgb(0, 131, 0);
     color: white;
     cursor: pointer;
     font-size: 16px;
@@ -38,14 +40,14 @@ form {
   }
   
   th {
-    background-color: blue;
+    background-color: rgb(76, 0, 92);
     color: white;
   }
   
   td button {
     padding: 5px;
     border: none;
-    background-color: red;
+    background-color: rgb(218, 104, 104);
     color: white;
     cursor: pointer;
     margin-right: 5px;
