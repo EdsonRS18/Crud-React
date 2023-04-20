@@ -1,16 +1,15 @@
 import React, { Component } from "react";
 import api from "../api";
 import AlunosList from "../alunosList";
-import './alunos.css';
+import Modal from "../modal";
+import "./alunos.css";
+
 
 class Alunos extends Component {
   state = {
     alunos: [],
-    novoAluno: {
-      nome: "",
-      cpf: "",
-      plano: "",
-    },
+    showModal: false,
+    alunoSelecionado: null // adicione uma variável de estado para armazenar o aluno selecionado
   };
 
   async componentDidMount() {
@@ -23,31 +22,12 @@ class Alunos extends Component {
     this.setState({ alunos: response.data });
   }
 
-  handleInputChange = (event) => {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
-
-    this.setState((prevState) => ({
-      novoAluno: {
-        ...prevState.novoAluno,
-        [name]: value,
-      },
-    }));
-  };
-
-  handleSubmit = async (event) => {
-    event.preventDefault();
-    const response = await api.post("/add", this.state.novoAluno);
+  handleAdd = async (novoAluno) => {
+    const response = await api.post("/add", novoAluno);
     console.log(response.data);
     this.setState(
       (prevState) => ({
         alunos: [...prevState.alunos, response.data],
-        novoAluno: {
-          nome: "",
-          cpf: "",
-          plano: "",
-        },
       }),
       () => {
         this.carregarAlunos();
@@ -55,8 +35,8 @@ class Alunos extends Component {
     );
   };
 
-  handleUpdate = async (id) => {
-    const response = await api.put(`/alunos/${id}`, this.state.novoAluno);
+  handleUpdate = async (id, novoAluno) => {
+    const response = await api.put(`/alunos/${id}`, novoAluno);
     console.log(response.data);
     this.setState(
       (prevState) => ({
@@ -67,11 +47,6 @@ class Alunos extends Component {
             return aluno;
           }
         }),
-        novoAluno: {
-          nome: "",
-          cpf: "",
-          plano: "",
-        },
       }),
       () => {
         this.carregarAlunos();
@@ -92,44 +67,40 @@ class Alunos extends Component {
     );
   };
 
+  handleShowModal = () => {
+    this.setState({ showModal: true });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false });
+  };
+
+  handleEdit = (aluno) => {
+    this.setState({ alunoSelecionado: aluno, showModal: true });
+  };
+
   render() {
-    const { novoAluno } = this.state;
     return (
       <div>
-        <h1>LISTAR</h1>
-        <form onSubmit={this.handleSubmit}>
-          <input
-            type="text"
-            name="nome"
-            placeholder="Nome"
-            value={novoAluno.nome}
-            onChange={this.handleInputChange}
-          />
-          <input
-            type="text"
-            name="cpf"
-            placeholder="CPF"
-            value={novoAluno.cpf}
-            onChange={this.handleInputChange}
-          />
-          <input
-            type="text"
-            name="plano"
-            placeholder="Plano"
-            value={novoAluno.plano}
-            onChange={this.handleInputChange}
-          />
-          <button type="submit">Adicionar</button>
-        </form>
+      
+        <button onClick={this.handleShowModal}>Adicionar aluno</button>
+        <Modal
+          show={this.state.showModal}
+          handleClose={this.handleCloseModal}
+          handleAdd={this.handleAdd}
+          handleUpdate={this.handleUpdate} // passe a função handleUpdate como prop para o componente Modal
+          aluno={this.state.alunoSelecionado} // passe o aluno selecionado como prop para o componente Modal
+        />
         <AlunosList
           alunos={this.state.alunos}
           handleDelete={this.handleDelete}
-          handleUpdate={this.handleUpdate}
+          handleEdit={this.handleEdit}
+          handleUpdate={this.handleUpdate} // add this line
         />
+        
       </div>
     );
   }
 }
 
 export default Alunos;
-
